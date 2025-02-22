@@ -9,4 +9,11 @@
   height: 100%;
 }
 
+.wp-block-b35-photo-post-content figure.wp-block-gallery figure.wp-block-image {
+  display: none;
+}
+.wp-block-b35-photo-post-content figure.wp-block-gallery figure.wp-block-image:first-child {
+  display: flex;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -32,7 +32,11 @@ function render_photo_post_content( $attributes, $content, $block ) {
 	$blocks = parse_blocks(get_the_content(null, false, $post_id));
 
 	$image_blocks = array_filter($blocks, function($block) {
-		return $block['blockName'] === 'core/image';
+		return in_array($block['blockName'], [
+			'core/image',
+			'core/video',
+			'core/gallery',
+		]);
 	});
 	if (count($image_blocks) > 0) {
 		$content = render_block(reset($image_blocks));
@@ -94,4 +98,4 @@ function b35_photo_blog_enqueue_scripts() {
         filemtime($cssfile)
     );
 }
-add_action( 'wp_enqueue_scripts', 'b35_photo_blog_enqueue_scripts', 1);
+add_action( 'wp_enqueue_scripts', 'b35_photo_blog_enqueue_scripts', 100);

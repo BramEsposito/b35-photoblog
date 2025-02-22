@@ -1,0 +1,7 @@
+.wp-block-b35-photo-post-content figure.wp-block-gallery figure.wp-block-image {
+	display: none;
+
+	&:first-child {
+		display: flex;
+	}
+}
