@@ -5,7 +5,7 @@ Plugin URI: http://bramesposito.com/projects/wordpress/photoblog
 Description: Create a Photoblog, comparable to some popular existing ones
 Author: Bram Esposito
 Author URI: http://bramesposito.com
-Version: 0.1.0
+Version: 0.1.1
 Text Domain: b35-photoblog
 License: MIT License
 */
