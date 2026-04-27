@@ -4,6 +4,9 @@
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 import { registerBlockType } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
+import { useEffect } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 
 /**
@@ -27,6 +30,22 @@ const photoPostIcon = (
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
+addFilter(
+	'editor.BlockEdit',
+	'b35-photoblog/image-lightbox-default',
+	createHigherOrderComponent( ( BlockEdit ) => {
+		return ( props ) => {
+			const { name, attributes, setAttributes } = props;
+			useEffect( () => {
+				if ( name === 'core/image' && ! attributes.lightbox ) {
+					setAttributes( { lightbox: { enabled: true, animation: 'zoom' } } );
+				}
+			}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
+			return <BlockEdit { ...props } />;
+		};
+	}, 'withLightboxDefault' )
+);
+
 registerBlockType( metadata.name, {
 
 	icon: photoPostIcon,
