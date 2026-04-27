@@ -38,11 +38,28 @@ function render_photo_post_content( $attributes, $content, $block ) {
 			'core/gallery',
 		]);
 	});
+
+	$in_query_loop = isset( $block->context['queryId'] );
+	$gallery_data  = '';
+
 	if (count($image_blocks) > 0) {
 		$first_block = reset($image_blocks);
-		if ( 'core/image' === $first_block['blockName'] && ! isset( $first_block['attrs']['lightbox'] ) ) {
-			$first_block['attrs']['lightbox'] = [ 'enabled' => true, 'animation' => 'zoom' ];
+
+		if ( 'core/image' === $first_block['blockName'] ) {
+			if ( $in_query_loop ) {
+				// Disable WP lightbox — our gallery JS handles navigation across posts.
+				$first_block['attrs']['lightbox'] = [ 'enabled' => false ];
+				$attachment_id = $first_block['attrs']['id'] ?? 0;
+				$full_src      = $attachment_id ? wp_get_attachment_url( $attachment_id ) : '';
+				if ( $full_src ) {
+					$alt          = $first_block['attrs']['alt'] ?? '';
+					$gallery_data = ' data-gallery-src="' . esc_attr( $full_src ) . '" data-gallery-alt="' . esc_attr( $alt ) . '"';
+				}
+			} elseif ( ! isset( $first_block['attrs']['lightbox'] ) ) {
+				$first_block['attrs']['lightbox'] = [ 'enabled' => true, 'animation' => 'zoom' ];
+			}
 		}
+
 		$content = render_block($first_block);
 	}
 	// Check for nextpage to display page links for paginated posts.
@@ -59,11 +76,7 @@ function render_photo_post_content( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
-	return (
-		'<div ' . $wrapper_attributes . '>' .
-		$content .
-		'</div>'
-	);
+	return '<div ' . $wrapper_attributes . $gallery_data . '>' . $content . '</div>';
 }
 
 /**
@@ -95,11 +108,24 @@ add_action( 'init', 'create_block_photo_post_content_block_init' );
  * @return void
  */
 function b35_photo_blog_enqueue_scripts() {
-    $cssfile = plugins_url("assets/css/style.css", __FILE__);
     wp_enqueue_style(
         'b35-photoblog-style',
-        $cssfile,
-        filemtime($cssfile)
+        plugins_url( 'assets/css/style.css', __FILE__ ),
+        [],
+        filemtime( plugin_dir_path( __FILE__ ) . 'assets/css/style.css' )
+    );
+    wp_enqueue_style(
+        'b35-gallery-style',
+        plugins_url( 'assets/css/gallery.css', __FILE__ ),
+        [],
+        filemtime( plugin_dir_path( __FILE__ ) . 'assets/css/gallery.css' )
+    );
+    wp_enqueue_script(
+        'b35-gallery',
+        plugins_url( 'assets/js/gallery.js', __FILE__ ),
+        [],
+        filemtime( plugin_dir_path( __FILE__ ) . 'assets/js/gallery.js' ),
+        true
     );
 }
 add_action( 'wp_enqueue_scripts', 'b35_photo_blog_enqueue_scripts', 100);
